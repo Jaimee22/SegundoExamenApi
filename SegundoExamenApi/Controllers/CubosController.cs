@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SegundoExamenApi.Models;
 using SegundoExamenApi.Repositories;
 using System.Numerics;
+using System.Security.Claims;
 
 namespace SegundoExamenApi.Controllers
 {
@@ -13,6 +15,7 @@ namespace SegundoExamenApi.Controllers
     {
 
         private RepositoryCubos repo;
+        private IHttpContextAccessor httpContextAccessor;
 
         public CubosController(RepositoryCubos repo)
         {
@@ -67,42 +70,27 @@ namespace SegundoExamenApi.Controllers
 
 
         [Authorize]
-        [HttpGet("usuarios/{idUsuario}/pedidos")]
-        public async Task<ActionResult<List<Pedido>>> VerPedidosDelUsuario(int idUsuario)
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<ActionResult<Usuario>> FindUsuario()
         {
-            try
-            {
-                var pedidos = await repo.VerPedidosDelUsuarioAsync(idUsuario);
-                if (pedidos.Count == 0)
-                    return NotFound("No se encontraron pedidos para el usuario especificado.");
-
-                return Ok(pedidos);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener pedidos del usuario: " + ex.Message);
-            }
+            Claim claim = HttpContext.User.FindFirst(x => x.Type == "UserData");
+            string jsonUser = claim.Value;
+            Usuario usuario = JsonConvert.DeserializeObject<Usuario>(jsonUser);
+            return usuario;
         }
-
 
 
         [Authorize]
-        [HttpGet("{idUsuario}")]
-        public async Task<ActionResult<Usuario>> FindUsuario(int idUsuario)
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<ActionResult<List<Pedido>>> Pedidos()
         {
-            Usuario usuario = await this.repo.FindUsuario(idUsuario);
-
-            if (usuario == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                return Ok(usuario);
-            }
-
+            string jsonUser = HttpContext.User.FindFirst(x => x.Type == "UserData").Value;
+            Usuario usuario = JsonConvert.DeserializeObject<Usuario>(jsonUser);
+            List<Pedido> pedidos = await this.repo.GetPedidosUsuarioAsync(usuario.IdUsuario);
+            return pedidos;
         }
-
 
 
 

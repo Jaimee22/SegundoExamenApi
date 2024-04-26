@@ -52,10 +52,15 @@ namespace SegundoExamenApi.Repositories
         }
 
 
+        public async Task<List<Usuario>> GetUsuarioAsync(int idusuario)
+        {
+            return await this.context.Usuarios.Where(x => x.IdUsuario == idusuario).ToListAsync();
+        }
 
-
-
-
+        public async Task<List<Pedido>> GetPedidosUsuarioAsync(int idusuario)
+        {
+            return await this.context.Pedidos.Where(x => x.IdUsuario == idusuario).ToListAsync();
+        }
 
 
 

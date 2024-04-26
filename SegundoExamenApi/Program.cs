@@ -17,20 +17,20 @@ builder.Services.AddAuthentication(helper.GetAuthenticateSchema()).AddJwtBearer(
 
 
 
-//builder.Services.AddAzureClients(factory =>
-//{
-//    factory.AddSecretClient
-//    (builder.Configuration.GetSection("KeyVault"));
-//});
-//SecretClient secretClient =
-//builder.Services.BuildServiceProvider().GetService<SecretClient>();
-//KeyVaultSecret secret =
-//    await secretClient.GetSecretAsync("SqlAzure");
-//string connectionString = secret.Value;
+builder.Services.AddAzureClients(factory =>
+{
+    factory.AddSecretClient
+    (builder.Configuration.GetSection("KeyVault"));
+});
+SecretClient secretClient =
+builder.Services.BuildServiceProvider().GetService<SecretClient>();
+KeyVaultSecret secret =
+    await secretClient.GetSecretAsync("SqlAzure");
+string connectionString = secret.Value;
 
 
 
-string connectionString = builder.Configuration.GetConnectionString("SqlAzure");
+//string connectionString = builder.Configuration.GetConnectionString("SqlAzure");
 builder.Services.AddTransient<RepositoryCubos>();
 builder.Services.AddDbContext<ExamenContext>(options => options.UseSqlServer(connectionString));
 

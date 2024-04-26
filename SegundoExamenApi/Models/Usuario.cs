@@ -10,7 +10,6 @@ namespace SegundoExamenApi.Models
         [Column("ID_USUARIO")]
         public int IdUsuario { get; set; }
 
-
         [Column("NOMBRE")]
         public string Nombre { get; set; }
 
